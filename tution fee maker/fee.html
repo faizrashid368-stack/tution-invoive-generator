@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4CAF50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <title>Tuition Receipt Pro</title>
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .app-container {
+            max-width: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: transform 0.2s;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+        }
+        
+        .receipt-preview {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .receipt-preview.show {
+            display: block;
+        }
+        
+        .receipt-header {
+            text-align: center;
+            border-bottom: 3px double #333;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .receipt-header h2 {
+            color: #667eea;
+            font-size: 22px;
+        }
+        
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+        
+        .receipt-row span:first-child {
+            color: #666;
+        }
+        
+        .receipt-row span:last-child {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .amount-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .amount-box h3 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .paid-stamp {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 15px 0;
+            transform: rotate(-5deg);
+        }
+        
+        .install-prompt {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .install-prompt.show {
+            display: block;
+        }
+        
+        .offline-badge {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #4CAF50;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: none;
+        }
+        
+        .offline-badge.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-badge" id="offlineBadge">⚡ Offline Mode</div>
+    
+    <div class="app-container">
+        <div class="header">
+            <h1>📚 Tuition Center</h1>
+        </div>
+        
+        <div class="install-prompt" id="installPrompt">
+            <strong>📲 Install App:</strong> Tap menu (⋮) → "Add to Home Screen"
+        </div>
+        
+        <form id="receiptForm">
+            <div class="form-group">
+                <label>Student Name</label>
+                <input type="text" id="studentName" placeholder="Enter full name" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Class / Grade</label>
+                <input type="text" id="studentClass" placeholder="e.g., 12th, Matric" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Fee Month</label>
+                <select id="feeMonth" required>
+                    <option value="">Select Month</option>
+                    <option>January 2026</option>
+                    <option>February 2026</option>
+                    <option>March 2026</option>
+                    <option>April 2026</option>
+                    <option>May 2026</option>
+                    <option>June 2026</option>
+                    <option>July 2026</option>
+                    <option>August 2026</option>
+                    <option>September 2026</option>
+                    <option>October 2026</option>
+                    <option>November 2026</option>
+                    <option>December 2026</option>
+                </select>
+            </div   >
